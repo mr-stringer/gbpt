@@ -1,0 +1,4 @@
+https://prices.azure.com/api/retail/prices?api-version=2023-01-01-preview
+https://prices.azure.com/api/retail/prices?api-version=2023-01-01-preview and currencyCode='GBP'&'$filter=serviceFamily%20eq%20%27Storage%27%20and%20armRegionName%20eq%20%27northeurope%27&$skip=1000
+
+https://prices.azure.com/api/retail/prices?currencyCode='GBP'&api-version=2023-01-01-preview&$filter=serviceFamily eq 'Storage' and armRegionName eq 'northeurope' and productName eq 'Azure Premium SSD v2'

@@ -1,0 +1,37 @@
+Notes on SSD v2 disks                                                      
+--- Size ---
+SSD v2 disks are available from 1GiB to 64TiB
+--- IOPS ---
+All disks are deployed with a baseline of 3,000 IOPS
+Maximum IOPS per disk is 80,000
+Above capacity reaches 6GiB, an additional 500 IOPS per GB is supported
+per GiB. A disk requiring 80,000 IOPS must be be at least 160GiB.
+--- Throughput
+All disks are deployed with 125MiB/s of throughput
+There is a ratio of 4K:1 between IOPS and throughput, or in other words,
+For every 1000 IOPSs provisioned, a maximum of 250MiB/s can be provisioned 
+--- PseudoCode ---
+//Check disk size
+if size <1GiB or >64TiB
+  fail - disk too big or too small
+//ensure IOPS is a multiple of 500
+if iops % 500 != 0
+  fail - iops must be a multiple of 500
+//ensure IOPS in range
+if iops < 3000 or > 80000
+   fail - iops too big or too small
+//Checks IOPS fit in disk size
+achievable_iops = 3000
+if size > 6 and < 160
+  achievable_iops = (size -6 ) * 500
+elseif size => 160
+  achievable_iops = 80000
+if iops > achievable_iops
+  fail - IOPS not achievable with this disk size
+// ensure throughput is in bounds
+if throughput < 125 or > 1200
+  fail - throughput too big or too small
+// ensure throughput is achievable with IOPS
+if throughput > (iops/4)
+  fail - not enough iops provisioned
+  
