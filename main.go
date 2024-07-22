@@ -1,26 +1,44 @@
 package main
 
 import (
-	"log"
+	"log/slog"
+	"os"
 )
 
 func main() {
-	log.Print("gbpt is getting the config")
-	c1 := GetConfig()
-	c1.Print()
+	/* Create logger */
+	/*Do something here to get the log level from command line! */
+	lvl := new(slog.LevelVar)
+	lvl.Set(slog.LevelDebug)
+
+	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+		Level: lvl,
+	}))
+
+	slog.SetDefault(logger)
+
+	c1, err := GetConfig()
+	if err != nil {
+		os.Exit(osExitLoadConfig)
+	}
 	eStrings, err := c1.Validate()
 	if err != nil {
-		log.Println("One or more configuration errors were discovered")
+		slog.Info("One or more configuration errors were discovered")
 		for _, v := range eStrings {
-			log.Println(v)
+			slog.Info(v)
 		}
-		log.Fatal(err)
+		slog.Error("Failed to validate error ", "error", err.Error())
+		os.Exit(osExitValidateConfig)
+
 	} else {
-		log.Println("Config is valid")
+		slog.Info("Config is valid")
+		c1.Print()
 	}
 
 	err = c1.PriceConfig()
 	if err != nil {
-		log.Fatal(err)
+		slog.Info("Failed to price config ", "error", err.Error())
+		os.Exit(osExitPriceConfig)
 	}
+	slog.Info("Done")
 }

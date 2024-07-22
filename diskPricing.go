@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 )
@@ -77,9 +77,9 @@ func (c Config) ReduceDisks() []DiskPrice {
 			}
 		}
 	}
-	log.Printf("Hopefully print a list of unique disks - found %d configs", len(rd1))
+	slog.Debug("ReduceDisks", "Unique Disk Configuration Found", len(rd1))
 	for _, rd := range rd1 {
-		log.Printf("DiskType:%d pssdType:%s, Location:%s", rd.DiskType, rd.Pssd, rd.Location)
+		slog.Debug("Disk", "Disk Type", rd.DiskType, "PssdType", rd.Pssd, "Location", rd.Location)
 	}
 
 	return rd1
@@ -88,7 +88,7 @@ func (c Config) ReduceDisks() []DiskPrice {
 // PriceDisks retrieves disks prices from the Azure Retail Price API
 func (c Config) PriceDisks() ([]DiskPrice, error) {
 	dp := c.ReduceDisks()
-	log.Printf("Got %d disks to price up", len(dp))
+	slog.Debug("PriceDisks", "Disks to price", len(dp))
 	for i, disk := range dp {
 		/*Price pssd */
 		if disk.DiskType == pssd {
@@ -110,7 +110,6 @@ func (c Config) PriceDisks() ([]DiskPrice, error) {
 			} else if len(ar.Items) > 1 {
 				return []DiskPrice{}, fmt.Errorf("the API response contained more than one item, this is unexpected, maybe the API has changed")
 			}
-			log.Print(ar.Items[0].RetailPrice)
 			dp[i].Price = ar.Items[0].RetailPrice
 		}
 		if disk.DiskType == pssdv2 {
@@ -144,7 +143,7 @@ func (c Config) PriceDisks() ([]DiskPrice, error) {
 					dp[i].GBs = item.RetailPrice
 				}
 			}
-			log.Printf("Disk:pssdv2, Location:%s, MB_Price:%0.2f, IOPS_Price:%0.2f, MBs_Price:%0.2f ", disk.Location, disk.GBs, disk.Iops, disk.MBps)
+			slog.Debug("PriceDisks price found", "Type", "pssdv2", "Location", disk.Location, "MB_Price", disk.GBs, "IOPS_Price", disk.Iops, "MB/s_Price", disk.MBps)
 
 			if dp[i].Iops == 0 || dp[i].MBps == 0 || dp[i].GBs == 0 {
 				return []DiskPrice{}, fmt.Errorf("was not able to to price all parts of pssdv2 disk")
@@ -165,7 +164,7 @@ func ApiPssdPriceString(c, l, p string) string {
 	/* but the following does what is needed */
 	s1 = strings.Replace(s1, " ", "%20", -1)
 	s1 = strings.Replace(s1, "%3D", "=", -1)
-	log.Println(s1)
+	slog.Debug("ApiPssdPriceString", "url", s1)
 	return s1
 }
 
@@ -178,6 +177,6 @@ func ApiPssdv2PriceString(c, l string) string {
 	/* Due to MS API weirdness, can't use net/url */
 	/* but the following does what is needed */
 	s1 = strings.Replace(s1, " ", "%20", -1)
-	log.Print(s1)
+	slog.Debug("ApiPssdv2PriceString", "url", s1)
 	return s1
 }
