@@ -1,16 +1,21 @@
 # GBPT
 
-Go Based Pricing Tool
+**This project is in it's early stages.**
 
-https://prices.azure.com/api/retail/prices?api-version=2023-01-01-preview&currencyCode='GBP'&$filter=armRegionName eq 'uksouth' and priceType eq 'Consumption' and serviceFamily eq 'Compute' and serviceName eq 'Virtual Machines' and skuName eq 'Standard_D2ds_v5'
+GBPT is a project that aims to offer a 'Pricing-as-Code' solution for VM and
+disk infrastructure for Azure.
 
-https://prices.azure.com/api/retail/prices?api-version=2023-01-01-preview&currencyCode='GBP'&$filter=armRegionName eq 'uksouth' and serviceFamily eq 'Compute' and serviceName eq 'Virtual Machines' and skuName eq 'Standard_D2ds_v5'
+## Why is Pricing-as-Code required?
 
-s2 = fmt.Sprintf("%scurrencyCode='%s'&$filter=armRegionName eq '%s' and SkuName eq '%s' and priceType eq 'Consumption' and serviceFamily eq 'Compute' and serviceName eq 'Virtual Machines'", BaseUrl, r[0], r[1], r[2])
+Getting an idea of how much Azure infrastructure might cost can be tricky.
+One option is to use the
+[Azure Calculator](https://azure.microsoft.com/en-gb/pricing/calculator/), which
+is a web-based tool involving lots of clicking and drop down menus. Azure
+Calculator allows you to quickly get pricing for any Azure service, but
+it difficult to manage at scale.
 
-% az vm list-sizes --location uksouth --query "[?numberOfCores ==\`2\` && memoryInMb <=\`9000\`  && memoryInMb >=\`8000\`].{Name:name,  Cores:numberOfCores, MemoryMiB:memoryInMb}" --output table
-Name                   Cores    MemoryMiB
----------------------  -------  -----------
-Standard_B2ms          2        8192
-Standard_B2s           2        4096
-...
+Using Azure Calculator for very large solutions becomes problematic. As more
+systems are added, the web interface slows down. When working with hundreds of
+lines, the web interface is unusable. Moreover, when changes are required, such
+as deploying systems to a different region, the user is required to make lots
+of manual changes. On large configurations, this can take it many hours. 

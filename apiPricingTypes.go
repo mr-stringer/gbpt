@@ -1,5 +1,7 @@
 package main
 
+// ApiResponse is a struct that encapsulates the response object from the Azure
+// Retail Pricing API
 type ApiResponse struct {
 	BillingCurrency    string `json:"BillingCurrency"`
 	CustomerEntityId   string `json:"CustomerEntityId"`
@@ -9,6 +11,8 @@ type ApiResponse struct {
 	Items              []Item `json:"Items"`
 }
 
+// Item is a struct that encapsulates the Item object found in the Azure Retail
+// Pricing API response
 type Item struct {
 	CurrencyCode         string        `json:"currencyCode"`
 	TierMinimumUnits     float32       `json:"tierMinimumUnits"`
@@ -35,6 +39,8 @@ type Item struct {
 	SavingsPlan          []SavingsPlan `json:"savingsPlan"`
 }
 
+// SavingsPlan is a struct that encapsulates the SavingsPlan object found in the
+// Items object found in the Azure Retail Pricing API
 type SavingsPlan struct {
 	UnitPrice   float32 `json:"unitPrice"`
 	RetailPrice float32 `json:"retailPrice"`
