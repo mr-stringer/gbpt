@@ -19,14 +19,8 @@ func main() {
 		log.Println("Config is valid")
 	}
 
-	vmp, err := c1.PriceVms()
+	err = c1.PriceConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, v := range vmp {
-		log.Print(v)
-	}
-
-	c1.ReduceDisks()
-
 }

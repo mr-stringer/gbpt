@@ -57,6 +57,7 @@ func (c Config) PriceVms() ([]VmPrice, error) {
 		log.Println(s1)
 		resp, err := http.Get(s1)
 		if err != nil {
+			log.Print("Problem getting response from API.")
 			return vmp, err
 		}
 		defer resp.Body.Close()
@@ -64,6 +65,7 @@ func (c Config) PriceVms() ([]VmPrice, error) {
 		jdec := json.NewDecoder(resp.Body)
 		err = jdec.Decode(&ar)
 		if err != nil {
+			log.Print("Problem with JSON decoder")
 			return vmp, err
 		}
 
@@ -74,7 +76,9 @@ func (c Config) PriceVms() ([]VmPrice, error) {
 
 		/* iterate and switch over the ar to find hourly, 1yrRi and 3yrRi costs */
 		for _, v := range ar.Items {
-			if v.Type == "Consumption" {
+
+			/* Don't use the Windows version */
+			if v.Type == "Consumption" && !strings.Contains(v.ProductName, "Windows") {
 				vmp[i].PaygHrRate = v.UnitPrice
 			} else if v.Type == "Reservation" && v.ReservationTerm == "1 Year" {
 				vmp[i].OneYrRi = v.UnitPrice

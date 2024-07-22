@@ -7,17 +7,22 @@ import (
 
 const blank string = ""
 
+// Config is a struct that represents the configuration supplied by the user
 type Config struct {
 	Currency        string
 	Applications    []Application
 	StorageProfiles []StorageProfile
 }
 
+// Application is a struct that represents an application configuration as
+// supplied by the user
 type Application struct {
 	Name         string
 	Environments []Environment
 }
 
+// Environment is a struct that represent an application environment as supplied
+// by the user
 type Environment struct {
 	Name     string
 	Location string
@@ -25,24 +30,30 @@ type Environment struct {
 	VMs      []Vm
 }
 
+// Vm is a struct that represents a Virtual Machine within an application
+// environment
 type Vm struct {
 	Name  string
-	Qty   int
+	Qty   uint
 	VmSku string
 	// The following bit has some hazards.  Consumption MUST be set correctly and the use of RiTermYears and PaygHours are mutually exclusive
 	// If the config is mismatched the program will quit
 	Consumption    string //must be ri or payg
 	RiTermYears    int    // must be 1 or 3, if not populated it will return fine 0 which is fine if PAYG is to be used
 	PaygHours      int    // must be a positive integer up to 730, will be populated is 0 if not
-	StorageProfile string // this string must match a named storage config in the StoragConfigurations array in the config
+	StorageProfile string // this string must match a named storage config in the StorageConfigurations array in the config
 
 }
 
+// StorageProfile is a struct that represents a one or more disks that will be
+// that be applied to one or more VMs
 type StorageProfile struct {
 	Name  string
 	Disks []Disk
 }
 
+// Disk is a struct the represents a disk type that will be applied by a
+// StorageProfile
 type Disk struct {
 	Name string // a friendly label
 	Type string // must match pssd or pssd_v2
@@ -52,6 +63,35 @@ type Disk struct {
 	MBs  uint   // required for pssd_v2 disks only, ignored if set for pssd but should raise a warning
 }
 
+// PriceLine represents all the information to price a single item in the config
+type PriceLine struct {
+	Application string
+	Environment string
+	Location    string
+	Item        string
+	Qty         uint
+	UnitPrice   float32
+	LinePrice   float32
+}
+
+// String outputs a human readable representation of the type PriceLine
+func (pl PriceLine) String() string {
+	return fmt.Sprintf("Application: %s, Environment:%s, Location:%s, Item:%s, Qty:%d, UnitPrice:%0.2f, TotalPrice:%0.2f",
+		pl.Application, pl.Environment, pl.Location, pl.Item, pl.Qty, pl.UnitPrice, pl.LinePrice)
+}
+
+// CvsString outputs a string used to populate the CSV config file
+func (pl PriceLine) CsvString() string {
+	return fmt.Sprintf("\"%s\",\"%s\",\"%s\",\"%s\",\"%d\",\"%0.2f\",\"%0.2f\"",
+		pl.Application, pl.Environment, pl.Location, pl.Item, pl.Qty, pl.UnitPrice, pl.LinePrice)
+}
+
+// csvHeader outputs the String header for the CSV file
+func csvHeader(currency string) string {
+	return fmt.Sprintf("\"Application\",\"Environment\",\"Location\",\"Description\",\"Qty\",\"UnitPrice\",\"LinePrice\"\"Currency:%s\"", currency)
+}
+
+// Print outputs a human readable representation of the Config type
 func (c Config) Print() {
 	fmt.Printf("Currency: %s\n", c.Currency)
 	fmt.Printf("Number of Applications: %d\n", len(c.Applications))
@@ -94,10 +134,12 @@ func (c Config) Print() {
 	}
 }
 
+// Validate ensures that the user input is valid. It will check all aspects of
+// the config and report on all errors.
 func (c Config) Validate() ([]string, error) {
 	/* Ensure currency is correct */
 	eStrings := []string{}
-	if !slices.Contains(supcur, c.Currency) {
+	if !slices.Contains(supCur, c.Currency) {
 		eStrings = append(eStrings, fmt.Sprintf("the value %s is not a supported currency", c.Currency))
 	}
 	/* Ensure that the Application slice is populated */

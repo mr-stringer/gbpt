@@ -60,10 +60,102 @@ var cfgGd01 = Config{
 	},
 }
 
+var cfgGd02 = Config{
+	Currency: "GBP",
+	Applications: []Application{
+		{
+			Name: "NFS",
+			Environments: []Environment{
+				{
+					Name:     "Production",
+					Location: "uksouth",
+					Phase:    0,
+					VMs: []Vm{
+						{
+							Name:           "NFS Cluster",
+							Qty:            2,
+							VmSku:          "Standard_ds2dsv5",
+							Consumption:    "ri",
+							RiTermYears:    3,
+							StorageProfile: "NfsProd",
+						},
+						{
+							Name:           "NFS Quorum",
+							Qty:            1,
+							VmSku:          "Standard_ds2dsv5",
+							Consumption:    "payg",
+							PaygHours:      500,
+							StorageProfile: "NfsProd",
+						},
+					},
+				}, {
+					Name:     "Development",
+					Location: "ukwest",
+					Phase:    0,
+					VMs: []Vm{
+						{
+							Name:           "NFS Server",
+							Qty:            2,
+							VmSku:          "Standard_ds2dsv5",
+							Consumption:    "payg",
+							PaygHours:      500,
+							StorageProfile: "NfsNonProd",
+						},
+					},
+				},
+			},
+		},
+	},
+	StorageProfiles: []StorageProfile{
+		{
+			Name: "NfsProd",
+			Disks: []Disk{
+				{
+					Name: "OS Disk",
+					Type: "pssd",
+					Qty:  1,
+					Size: 128,
+				},
+				{
+					Name: "Other Disk",
+					Type: "pssd_v2",
+					Qty:  1,
+					Size: 1024,
+					Iops: 5000,
+					MBs:  500,
+				},
+			},
+		}, {
+			Name: "NfsNonProd",
+			Disks: []Disk{
+				{
+					Name: "OS Disk",
+					Type: "pssd",
+					Qty:  1,
+					Size: 64,
+				},
+				{
+					Name: "Same Size App Disk",
+					Type: "pssd",
+					Qty:  2,
+					Size: 64,
+				},
+
+				{
+					Name: "Other Disk",
+					Type: "pssd",
+					Qty:  1,
+					Size: 512,
+				},
+			},
+		},
+	},
+}
+
 func TestConfig_Validate(t *testing.T) {
 	/* Configure test vars */
 	wrongCurrency := cfgGd01
-	wrongCurrency.Currency = "Zorp"
+	wrongCurrency.Currency = "Shillings"
 	/* Empty App struct */
 	noApplications := cfgGd01
 	noApplications.Applications = nil
@@ -246,7 +338,7 @@ func TestConfig_Validate(t *testing.T) {
 		{"Environment Not Named", fields(environmentNotNamed), true},
 		{"Incorrect Location", fields(environmentWrongLoc), true},
 		{"VMs Not Populated", fields(vmsNotPopulated), true},
-		{"VM Not Mamed", fields(vmNotNamed), true},
+		{"VM Not Named", fields(vmNotNamed), true},
 		{"VM Qty Not Set", fields(vmNotQtySet), true},
 		{"VM Reserved Instance Years Incorrectly Set", fields(vmRiTermIncorrect), true},
 		{"VM PAYG Hours Incorrectly Set", fields(vmPaygHoursIncorrect), true},

@@ -1,10 +1,15 @@
 package main
 
 /* Preview version of the API currently needed for pssd_v2 prices*/
+
+// URL for the Azure Retail Price API
 const ApiUrl = "https://prices.azure.com/api/retail/prices"
+
+// Preview Version used by gbpt
 const ApiPreview = "2023-01-01-preview"
 
-var supcur = []string{"USD", "AUD", "BRL",
+// sapCur is a slice of strings the represent supported currencies
+var supCur = []string{"USD", "AUD", "BRL",
 	"CAD", "CHF", "CNY",
 	"DKK", "EUR", "GBP",
 	"INR", "JPY", "KRW",
@@ -13,6 +18,8 @@ var supcur = []string{"USD", "AUD", "BRL",
 
 /* list of regions generated with az */
 /* az account list-locations --query "[].{Name:name}" -o table */
+
+// supReg is a slice of strings that represent the supported Azure regions
 var supReg = []string{"eastus", "southcentralus", "westus2", "westus3",
 	"australiaeast", "southeastasia", "northeurope", "swedencentral",
 	"uksouth", "westeurope", "centralus", "southafricanorth",
@@ -37,36 +44,39 @@ var supReg = []string{"eastus", "southcentralus", "westus2", "westus3",
 	"germanynorth", "norwaywest", "switzerlandwest", "ukwest",
 	"uaecentral", "brazilsoutheast"}
 
-func GetPssdFromSize(sz uint) string {
+// getPssdFromSize is a function that takes the size of a required premium SSD
+// disk and returns the SKU string for pricing. This allows users who do not
+// know SKU of the disk sizes to simply supply the disk size in the config.
+func getPssdFromSize(sz uint) string {
 	switch {
 	case sz <= 4:
-		return "p1"
+		return "P1"
 	case sz <= 8:
-		return "p2"
+		return "P2"
 	case sz <= 16:
-		return "p3"
+		return "P3"
 	case sz <= 32:
-		return "p4"
+		return "P4"
 	case sz <= 64:
-		return "p6"
+		return "P6"
 	case sz <= 128:
-		return "p10"
+		return "P10"
 	case sz <= 256:
-		return "p15"
+		return "P15"
 	case sz <= 512:
-		return "p20"
+		return "P20"
 	case sz <= 1024:
-		return "p30"
+		return "P30"
 	case sz <= 2048:
-		return "p40"
+		return "P40"
 	case sz <= 4096:
-		return "p50"
+		return "P50"
 	case sz <= 8192:
-		return "p60"
+		return "P60"
 	case sz <= 16384:
-		return "p70"
+		return "P70"
 	case sz <= 32768:
-		return "p80"
+		return "P80"
 	default:
 		return "error"
 	}
