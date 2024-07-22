@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 )
@@ -30,7 +30,6 @@ func (c Config) ReduceVms() []vmReduction {
 			for _, vm := range env.VMs {
 				match := false
 				for _, red := range ret {
-					log.Printf("")
 					if red.Location == env.Location && red.Sku == vm.VmSku {
 						match = true
 					}
@@ -48,16 +47,16 @@ func (c Config) PriceVms() ([]VmPrice, error) {
 	vms := c.ReduceVms()
 	vmp := make([]VmPrice, len(vms))
 	for i, vm := range vms {
-		log.Printf("Making VM API call %d of %d", i+1, len(vms))
+		slog.Debug("PriceVms", "current_call", i+1, "total_calls", len(vms))
 		vmp[i].Currency = c.Currency
 		vmp[i].Location = vm.Location
 		vmp[i].VmSku = vm.Sku
 		/* Format String */
 		s1 := apiVmPriceString(c.Currency, vmp[i].Location, vmp[i].VmSku)
-		log.Println(s1)
+		slog.Debug("PriceVms", "url", s1)
 		resp, err := http.Get(s1)
 		if err != nil {
-			log.Print("Problem getting response from API.")
+			slog.Debug("Problem getting response from API.")
 			return vmp, err
 		}
 		defer resp.Body.Close()
@@ -65,7 +64,7 @@ func (c Config) PriceVms() ([]VmPrice, error) {
 		jdec := json.NewDecoder(resp.Body)
 		err = jdec.Decode(&ar)
 		if err != nil {
-			log.Print("Problem with JSON decoder")
+			slog.Debug("Problem with JSON decoder")
 			return vmp, err
 		}
 

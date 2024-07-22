@@ -1,27 +1,33 @@
 package main
 
 import (
-	"log"
+	"log/slog"
 
 	"github.com/spf13/viper"
 )
 
-func GetConfig() Config {
+const (
+	osExitLoadConfig = iota + 1
+	osExitValidateConfig
+	osExitPriceConfig
+)
+
+func GetConfig() (Config, error) {
 
 	viper.AddConfigPath("./")
 	viper.SetConfigFile("gbpt.yaml")
 	viper.SetConfigType("yaml")
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Print("Failed to read in config")
-		log.Fatal(err)
+		slog.Error("Failed to read in config")
+		return Config{}, err
 	}
 
 	c1 := Config{}
 	err = viper.Unmarshal(&c1)
 	if err != nil {
-		log.Print("Failed ro unmarshal config")
-		log.Fatal(err)
+		slog.Error("Failed ro unmarshal config")
+		return Config{}, err
 	}
-	return c1
+	return c1, nil
 }
