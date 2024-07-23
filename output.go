@@ -2,8 +2,9 @@ package main
 
 import (
 	"bufio"
-	"log"
 	"os"
+
+	"golang.org/x/exp/slog"
 )
 
 // WriteToFile is a function to takes a slice of strings and outputs them in order
@@ -11,7 +12,7 @@ import (
 func WriteToFile(data *[]string, path string) error {
 	f, err := os.Create(path)
 	if err != nil {
-		log.Printf("Could not create file %s\n", path)
+		slog.Error("Could not create file", "path", path)
 		return err
 	}
 	defer f.Close()
@@ -19,10 +20,11 @@ func WriteToFile(data *[]string, path string) error {
 	for _, l := range *data {
 		_, err := w.WriteString(l + "\n")
 		if err != nil {
-			log.Printf("Failed to write file")
+			slog.Error("Failed to write file", "path", path)
 			return err
 		}
 	}
 	w.Flush()
+	slog.Info("Price file written", "path", path)
 	return nil
 }

@@ -28,3 +28,28 @@ The advantages of Pricing-as-Code are as follows:
 * Changes to SKUs can be done manually with a graphical text editor or can
   use find/replace techniques in an editor or on the command line.
   
+## Usage
+
+gbpt supports two flags:
+
+* -l is used to set the logging level which may be set to:
+  * 'e' for error
+  * 'w' for warnings
+  * 'i' for information
+  * 'd' for debug
+* -printConfig is used to print the Azure config. In this mode log level is set
+  to warning and the application stops as soon as the configuration is printed.
+
+### Examples
+
+To set logging to 'information' run:
+
+```console
+foo@bar:~$ ./gbpt -l=i
+```
+
+To print the Azure configuration run:
+
+```console
+foo@bar:~$ ./gbpt -printConfig
+```
