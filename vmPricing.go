@@ -22,6 +22,7 @@ type vmReduction struct {
 /* IT outputs a slice of the type vmReduction. The vmReduction slice          */
 /* is then used to retrieve the cost of a single PAYG hour, 1 & 3yr RIs       */
 func (c Config) ReduceVms() []vmReduction {
+	slog.Info("Reducing VMs")
 	ret := []vmReduction{}
 
 	/* Cycle through the applications searching for VMs */
@@ -44,16 +45,17 @@ func (c Config) ReduceVms() []vmReduction {
 }
 
 func (c Config) PriceVms() ([]VmPrice, error) {
+	slog.Info("Pricing VMs")
 	vms := c.ReduceVms()
 	vmp := make([]VmPrice, len(vms))
 	for i, vm := range vms {
-		slog.Debug("PriceVms", "current_call", i+1, "total_calls", len(vms))
 		vmp[i].Currency = c.Currency
 		vmp[i].Location = vm.Location
 		vmp[i].VmSku = vm.Sku
 		/* Format String */
 		s1 := apiVmPriceString(c.Currency, vmp[i].Location, vmp[i].VmSku)
 		slog.Debug("PriceVms", "url", s1)
+		slog.Info("Making VM API call", "call", i+1, "of", len(vms))
 		resp, err := http.Get(s1)
 		if err != nil {
 			slog.Debug("Problem getting response from API.")
@@ -86,6 +88,7 @@ func (c Config) PriceVms() ([]VmPrice, error) {
 			}
 		}
 	}
+	slog.Info("Pricing VMs complete")
 	return vmp, nil
 }
 

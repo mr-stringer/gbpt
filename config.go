@@ -7,13 +7,14 @@ import (
 )
 
 const (
-	osExitLoadConfig = iota + 1
+	osExitIncorrectFlagConfig = iota + 1
+	osExitLoadConfig
 	osExitValidateConfig
 	osExitPriceConfig
 )
 
 func GetConfig() (Config, error) {
-
+	slog.Info("Attempting to read config")
 	viper.AddConfigPath("./")
 	viper.SetConfigFile("gbpt.yaml")
 	viper.SetConfigType("yaml")

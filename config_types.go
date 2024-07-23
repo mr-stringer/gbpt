@@ -209,7 +209,7 @@ func (c Config) Validate() ([]string, error) {
 				}
 				/* Ensure MBs are possible for requested IOPS */
 				if disk.MBs > disk.Iops/4 {
-					eStrings = append(eStrings, fmt.Sprintf("StorageProfile:%d Disk:%d MBs set to '%d' but maximum MBs for %d IOPS is %d", si, di, disk.MBs, disk.Iops, disk.Iops/4))
+					eStrings = append(eStrings, fmt.Sprintf("StorageProfile:%d Disk:%d MBs set to '%d' but maximum MBs for '%d' IOPS is '%d'", si, di, disk.MBs, disk.Iops, disk.Iops/4))
 				}
 			}
 		}

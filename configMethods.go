@@ -9,6 +9,7 @@ import (
 // PriceConfig is called after validation and builds the pricing and outputs a
 // file.
 func (c Config) PriceConfig() error {
+	slog.Info("Pricing configuration")
 	vmp, err := c.PriceVms()
 	if err != nil {
 		return err
@@ -29,6 +30,7 @@ func (c Config) PriceConfig() error {
 	}
 
 	pl := []PriceLine{}
+	slog.Info("Populating price list")
 	/* Iterate over the	config */
 	for _, app := range c.Applications {
 		slog.Debug("Pricing application:", "Application", app.Name)
