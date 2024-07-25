@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
-	"net/http"
 	"strings"
 )
 
@@ -56,7 +55,7 @@ func (c Config) PriceVms() ([]VmPrice, error) {
 		s1 := apiVmPriceString(c.Currency, vmp[i].Location, vmp[i].VmSku)
 		slog.Debug("PriceVms", "url", s1)
 		slog.Info("Making VM API call", "call", i+1, "of", len(vms))
-		resp, err := http.Get(s1)
+		resp, err := Client.Get(s1)
 		if err != nil {
 			slog.Debug("Problem getting response from API.")
 			return vmp, err

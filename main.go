@@ -3,7 +3,12 @@ package main
 import (
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
+)
+
+var (
+	Client HTTPClient
 )
 
 func main() {
@@ -46,6 +51,8 @@ func main() {
 		os.Exit(0)
 	}
 
+	/*Init the client */
+	Client = &http.Client{}
 	err = c1.PriceConfig()
 	if err != nil {
 		slog.Info("Failed to price config ", "error", err.Error())

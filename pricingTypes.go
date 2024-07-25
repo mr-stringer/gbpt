@@ -1,5 +1,7 @@
 package main
 
+import "net/http"
+
 // VmPrice is a struct that stores all possible prices for a VM at a given
 // location.
 type VmPrice struct {
@@ -28,4 +30,8 @@ type DiskPrice struct {
 	MBps     float32
 	GBs      float32
 	Price    float32
+}
+
+type HTTPClient interface {
+	Get(url string) (resp *http.Response, err error)
 }

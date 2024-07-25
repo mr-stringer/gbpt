@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
-	"net/http"
 	"strings"
 )
 
@@ -94,7 +93,7 @@ func (c Config) PriceDisks() ([]DiskPrice, error) {
 		if disk.DiskType == pssd {
 			s1 := ApiPssdPriceString(c.Currency, disk.Location, disk.Pssd)
 			slog.Info("Making disk API call", "call", i+1, "of", len(dp))
-			resp, err := http.Get(s1)
+			resp, err := Client.Get(s1)
 			if err != nil {
 				return []DiskPrice{}, err
 			}
@@ -116,7 +115,7 @@ func (c Config) PriceDisks() ([]DiskPrice, error) {
 		if disk.DiskType == pssdv2 {
 			s1 := ApiPssdv2PriceString(c.Currency, disk.Location)
 			slog.Info("Making disk API call", "call", i+1, "of", len(dp))
-			resp, err := http.Get(s1)
+			resp, err := Client.Get(s1)
 			if err != nil {
 				return []DiskPrice{}, nil
 			}
