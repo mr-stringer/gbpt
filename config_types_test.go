@@ -390,3 +390,96 @@ func TestConfig_Print(t *testing.T) {
 		})
 	}
 }
+
+func TestPriceLine_String(t *testing.T) {
+	type fields struct {
+		Application string
+		Environment string
+		Location    string
+		Item        string
+		Qty         uint
+		UnitPrice   float32
+		LinePrice   float32
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{"Good", fields{"ECC", "Production", "uksouth", "VM", 1, 10.0, 10.0},
+			"Application:ECC, Environment:Production, Location:uksouth, Item:VM, Qty:1, UnitPrice:10.00, TotalPrice:10.00"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pl := PriceLine{
+				Application: tt.fields.Application,
+				Environment: tt.fields.Environment,
+				Location:    tt.fields.Location,
+				Item:        tt.fields.Item,
+				Qty:         tt.fields.Qty,
+				UnitPrice:   tt.fields.UnitPrice,
+				LinePrice:   tt.fields.LinePrice,
+			}
+			if got := pl.String(); got != tt.want {
+				t.Errorf("PriceLine.String() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPriceLine_CsvString(t *testing.T) {
+	type fields struct {
+		Application string
+		Environment string
+		Location    string
+		Item        string
+		Qty         uint
+		UnitPrice   float32
+		LinePrice   float32
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{"Good", fields{"ECC", "Production", "uksouth", "VM", 1, 10.0, 10.0},
+			"\"ECC\",\"Production\",\"uksouth\",\"VM\",\"1\",\"10.00\",\"10.00\""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pl := PriceLine{
+				Application: tt.fields.Application,
+				Environment: tt.fields.Environment,
+				Location:    tt.fields.Location,
+				Item:        tt.fields.Item,
+				Qty:         tt.fields.Qty,
+				UnitPrice:   tt.fields.UnitPrice,
+				LinePrice:   tt.fields.LinePrice,
+			}
+			if got := pl.CsvString(); got != tt.want {
+				t.Errorf("PriceLine.CsvString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_csvHeader(t *testing.T) {
+	type args struct {
+		currency string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"Good", args{"GBP"},
+			"\"Application\",\"Environment\",\"Location\",\"Description\",\"Qty\",\"UnitPrice\",\"LinePrice\"\"Currency:GBP\""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := csvHeader(tt.args.currency); got != tt.want {
+				t.Errorf("csvHeader() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

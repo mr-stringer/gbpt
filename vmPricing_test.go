@@ -95,3 +95,46 @@ func TestConfig_ReduceVms(t *testing.T) {
 		})
 	}
 }
+
+func TestConfig_PriceVms(t *testing.T) {
+	Applications := cfgGd01.Applications
+	StorageProfiles := cfgGd01.StorageProfiles
+	type fields struct {
+		Currency        string
+		Applications    []Application
+		StorageProfiles []StorageProfile
+	}
+	type args struct {
+		in0 apiGetter
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    []VmPrice
+		wantErr bool
+	}{
+		{"ApiCallFailed", fields{"GBP", Applications, StorageProfiles}, args{mockGetterFail}, []VmPrice{}, true},
+		{"NoItemsInResponse", fields{"GBP", Applications, StorageProfiles}, args{mockGetterNoItems}, []VmPrice{}, true},
+		{"ApiSimplePaygVm", fields{"GBP", simpleAppPaygConfig, simpleStorageProfilePssd}, args{mockGetterSimpleAppPayg}, simpleAppPaygConfigReturn, false},
+		{"ApiSimple1YrRiVm", fields{"GBP", simpleApp1YrRiConfig, simpleStorageProfilePssd}, args{mockGetterSimpleApp1YrRi}, simpleApp1YrRiConfigReturn, false},
+		{"ApiSimple3YrRiVm", fields{"GBP", simpleApp3YrRiConfig, simpleStorageProfilePssd}, args{mockGetterSimpleApp3YrRi}, simpleApp3YrRiConfigReturn, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := Config{
+				Currency:        tt.fields.Currency,
+				Applications:    tt.fields.Applications,
+				StorageProfiles: tt.fields.StorageProfiles,
+			}
+			got, err := c.PriceVms(tt.args.in0)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Config.PriceVms() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Config.PriceVms() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

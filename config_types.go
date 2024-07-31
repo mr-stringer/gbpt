@@ -76,7 +76,7 @@ type PriceLine struct {
 
 // String outputs a human readable representation of the type PriceLine
 func (pl PriceLine) String() string {
-	return fmt.Sprintf("Application: %s, Environment:%s, Location:%s, Item:%s, Qty:%d, UnitPrice:%0.2f, TotalPrice:%0.2f",
+	return fmt.Sprintf("Application:%s, Environment:%s, Location:%s, Item:%s, Qty:%d, UnitPrice:%0.2f, TotalPrice:%0.2f",
 		pl.Application, pl.Environment, pl.Location, pl.Item, pl.Qty, pl.UnitPrice, pl.LinePrice)
 }
 
