@@ -86,3 +86,47 @@ func TestApiPssdv2PriceString(t *testing.T) {
 		})
 	}
 }
+
+func TestConfig_PriceDisks(t *testing.T) {
+	type fields struct {
+		Currency        string
+		Applications    []Application
+		StorageProfiles []StorageProfile
+	}
+	type args struct {
+		apg apiGetter
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    []DiskPrice
+		wantErr bool
+	}{
+		{"SimplePssd", fields{"GBP", simpleAppPaygConfig, simpleStorageProfilePssd}, args{mockGetterSimplePssd}, simpleStorageProfilePssdReturn, false},
+		{"ApiCallFailsPssd", fields{"GBP", simpleAppPaygConfig, simpleStorageProfilePssd}, args{mockGetterFail}, []DiskPrice{}, true},
+		{"ApiNoResultsPssd", fields{"GBP", simpleAppPaygConfig, simpleStorageProfilePssd}, args{mockGetterNoItems}, []DiskPrice{}, true},
+		{"TooManyPssdReturned", fields{"GBP", simpleAppPaygConfig, simpleStorageProfilePssd}, args{mockGetterTooManyPssd}, []DiskPrice{}, true},
+		{"SimplePssdv2", fields{"GBP", simpleAppPaygConfig, simpleStorageProfilePssdv2}, args{mockGetterPssdv2}, simpleStorageProfilePssdReturnv2, false},
+		{"ApiNoResultsPssdv2", fields{"GBP", simpleAppPaygConfig, simpleStorageProfilePssdv2}, args{mockGetterPssdv2NoResult}, []DiskPrice{}, true},
+		{"ApiCallFailsPssdv2", fields{"GBP", simpleAppPaygConfig, simpleStorageProfilePssdv2}, args{mockGetterPssdv2ApiCallFailed}, []DiskPrice{}, true},
+		{"ZeroPricePssdv2", fields{"GBP", simpleAppPaygConfig, simpleStorageProfilePssdv2}, args{mockGetterPssdv2ZeroPrice}, []DiskPrice{}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := Config{
+				Currency:        tt.fields.Currency,
+				Applications:    tt.fields.Applications,
+				StorageProfiles: tt.fields.StorageProfiles,
+			}
+			got, err := c.PriceDisks(tt.args.apg)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Config.PriceDisks() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Config.PriceDisks() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

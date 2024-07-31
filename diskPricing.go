@@ -1,10 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log/slog"
-	"net/http"
 	"strings"
 )
 
@@ -86,7 +84,7 @@ func (c Config) ReduceDisks() []DiskPrice {
 }
 
 // PriceDisks retrieves disks prices from the Azure Retail Price API
-func (c Config) PriceDisks() ([]DiskPrice, error) {
+func (c Config) PriceDisks(apg apiGetter) ([]DiskPrice, error) {
 	slog.Info("Pricing disks")
 	dp := c.ReduceDisks()
 	for i, disk := range dp {
@@ -94,16 +92,10 @@ func (c Config) PriceDisks() ([]DiskPrice, error) {
 		if disk.DiskType == pssd {
 			s1 := ApiPssdPriceString(c.Currency, disk.Location, disk.Pssd)
 			slog.Info("Making disk API call", "call", i+1, "of", len(dp))
-			resp, err := http.Get(s1)
+			ar, err := apg(s1)
+
 			if err != nil {
 				return []DiskPrice{}, err
-			}
-			defer resp.Body.Close()
-			ar := ApiResponse{}
-			jdec := json.NewDecoder(resp.Body)
-			err = jdec.Decode(&ar)
-			if err != nil {
-				return []DiskPrice{}, nil
 			}
 
 			if len(ar.Items) == 0 {
@@ -116,14 +108,7 @@ func (c Config) PriceDisks() ([]DiskPrice, error) {
 		if disk.DiskType == pssdv2 {
 			s1 := ApiPssdv2PriceString(c.Currency, disk.Location)
 			slog.Info("Making disk API call", "call", i+1, "of", len(dp))
-			resp, err := http.Get(s1)
-			if err != nil {
-				return []DiskPrice{}, nil
-			}
-			ar := ApiResponse{}
-			defer resp.Body.Close()
-			jdec := json.NewDecoder(resp.Body)
-			err = jdec.Decode(&ar)
+			ar, err := apg(s1)
 			if err != nil {
 				return []DiskPrice{}, err
 			}

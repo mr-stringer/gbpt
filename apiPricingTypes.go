@@ -4,7 +4,7 @@ package main
 // Retail Pricing API
 type ApiResponse struct {
 	BillingCurrency    string `json:"BillingCurrency"`
-	CustomerEntityId   string `json:"CustomerEntityId"`
+	CustomerEntityID   string `json:"CustomerEntityId"`
 	CustomerEntityType string `json:"CustomerEntityType"`
 	NextPageLink       string `json:"NextPageLink"`
 	Count              uint   `json:"Count"`
@@ -24,8 +24,8 @@ type Item struct {
 	MeterID              string        `json:"0084b086-37bf-4bee-b27f-6eb0f9ee4954"`
 	MeterName            string        `json:"meterName"`
 	ProductID            string        `json:"productId"`
-	SkuId                string        `json:"skuId"`
-	AvailabilityId       string        `json:"availabilityId"`
+	SkuID                string        `json:"skuId"`
+	AvailabilityID       string        `json:"availabilityId"`
 	ProductName          string        `json:"productName"`
 	SkuName              string        `json:"skuName"`
 	ServiceName          string        `json:"serviceName"`
