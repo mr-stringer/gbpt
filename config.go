@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+/* Document exit codes */
 const (
 	osExitIncorrectFlagConfig = iota + 1
 	osExitLoadConfig
@@ -13,6 +14,7 @@ const (
 	osExitPriceConfig
 )
 
+/* GetConfig is a function reads the config from disk and returns a Config type */
 func GetConfig() (Config, error) {
 	slog.Info("Attempting to read config")
 	viper.AddConfigPath("./")

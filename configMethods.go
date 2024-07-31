@@ -10,12 +10,12 @@ import (
 // file.
 func (c Config) PriceConfig() error {
 	slog.Info("Pricing configuration")
-	vmp, err := c.PriceVms()
+	vmp, err := c.PriceVms(apiGet)
 	if err != nil {
 		return err
 	}
 
-	dskp, err := c.PriceDisks()
+	dskp, err := c.PriceDisks(apiGet)
 	if err != nil {
 		return err
 	}
@@ -147,7 +147,7 @@ func (c Config) PriceConfig() error {
 	}
 
 	csvData = append(csvData, "\"\",\"\",\"\",\"\",\"\",\"\",\"\"")
-	csvData = append(csvData, fmt.Sprintf("\"\",\"\",\"\",\"\",\"\",\"Total Cost\",\"%0.2f\"", TotalCost))
+	csvData = append(csvData, fmt.Sprintf("\"\",\"\",\"\",\"\",\"\",\"Total Cost(%s)\",\"%0.2f\"", c.Currency, TotalCost))
 
 	WriteToFile(&csvData, "/tmp/testOutput")
 

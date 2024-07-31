@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"strings"
@@ -43,7 +42,7 @@ func (c Config) ReduceVms() []vmReduction {
 	return ret
 }
 
-func (c Config) PriceVms() ([]VmPrice, error) {
+func (c Config) PriceVms(ap apiGetter) ([]VmPrice, error) {
 	slog.Info("Pricing VMs")
 	vms := c.ReduceVms()
 	vmp := make([]VmPrice, len(vms))
@@ -55,23 +54,14 @@ func (c Config) PriceVms() ([]VmPrice, error) {
 		s1 := apiVmPriceString(c.Currency, vmp[i].Location, vmp[i].VmSku)
 		slog.Debug("PriceVms", "url", s1)
 		slog.Info("Making VM API call", "call", i+1, "of", len(vms))
-		resp, err := Client.Get(s1)
+		ar, err := ap(s1)
 		if err != nil {
-			slog.Debug("Problem getting response from API.")
-			return vmp, err
-		}
-		defer resp.Body.Close()
-		ar := ApiResponse{}
-		jdec := json.NewDecoder(resp.Body)
-		err = jdec.Decode(&ar)
-		if err != nil {
-			slog.Debug("Problem with JSON decoder")
-			return vmp, err
+			return []VmPrice{}, err
 		}
 
 		/* Ensure that something came out of the call */
-		if ar.Count < 1 {
-			return vmp, fmt.Errorf("API response contained no item, perhaps the SKU is wrong")
+		if len(ar.Items) < 1 {
+			return []VmPrice{}, fmt.Errorf("API response contained no item, perhaps the SKU is wrong")
 		}
 
 		/* iterate and switch over the ar to find hourly, 1yrRi and 3yrRi costs */
